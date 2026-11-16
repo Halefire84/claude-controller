@@ -25,23 +25,23 @@ class MainActivity : AppCompatActivity() {
             } else false
         }
 
-        wireQueue(JobCardBinding.bind(b.cardQueueOutreach), Queues.OUTREACH)
-        wireQueue(JobCardBinding.bind(b.cardQueueReceptionist), Queues.RECEPTIONIST_PITCH)
-        wireQueue(JobCardBinding.bind(b.cardQueueSiteBuild), Queues.SITE_BUILD)
-        wireQueue(JobCardBinding.bind(b.cardQueueDailyOps), Queues.DAILY_OPS)
+        wireQueue(b.cardQueueOutreach, Queues.OUTREACH)
+        wireQueue(b.cardQueueReceptionist, Queues.RECEPTIONIST_PITCH)
+        wireQueue(b.cardQueueSiteBuild, Queues.SITE_BUILD)
+        wireQueue(b.cardQueueDailyOps, Queues.DAILY_OPS)
 
-        wireJob(JobCardBinding.bind(b.cardFindProspects), Jobs.FIND_PROSPECTS)
-        wireJob(JobCardBinding.bind(b.cardDraftEmail), Jobs.DRAFT_EMAIL)
-        wireJob(JobCardBinding.bind(b.cardCheckInbox), Jobs.CHECK_INBOX)
-        wireJob(JobCardBinding.bind(b.cardBuildDemo), Jobs.BUILD_DEMO)
-        wireJob(JobCardBinding.bind(b.cardAuditSite), Jobs.AUDIT_SITE)
-        wireJob(JobCardBinding.bind(b.cardRunRunbook), Jobs.RUN_RUNBOOK)
-        wireJob(JobCardBinding.bind(b.cardCustomJob), Jobs.CUSTOM)
-        wireJob(JobCardBinding.bind(b.cardReceptionistBuildProfile), Jobs.RECEPTIONIST_BUILD_PROFILE)
-        wireJob(JobCardBinding.bind(b.cardReceptionistDraftReply), Jobs.RECEPTIONIST_DRAFT_REPLY)
-        wireJob(JobCardBinding.bind(b.cardReceptionistTest), Jobs.RECEPTIONIST_TEST)
-        wireJob(JobCardBinding.bind(b.cardReceptionistPitch), Jobs.RECEPTIONIST_PITCH)
-        wireJob(JobCardBinding.bind(b.cardReceptionistOnboard), Jobs.RECEPTIONIST_ONBOARD)
+        wireJob(b.cardFindProspects, Jobs.FIND_PROSPECTS)
+        wireJob(b.cardDraftEmail, Jobs.DRAFT_EMAIL)
+        wireJob(b.cardCheckInbox, Jobs.CHECK_INBOX)
+        wireJob(b.cardBuildDemo, Jobs.BUILD_DEMO)
+        wireJob(b.cardAuditSite, Jobs.AUDIT_SITE)
+        wireJob(b.cardRunRunbook, Jobs.RUN_RUNBOOK)
+        wireJob(b.cardCustomJob, Jobs.CUSTOM)
+        wireJob(b.cardReceptionistBuildProfile, Jobs.RECEPTIONIST_BUILD_PROFILE)
+        wireJob(b.cardReceptionistDraftReply, Jobs.RECEPTIONIST_DRAFT_REPLY)
+        wireJob(b.cardReceptionistTest, Jobs.RECEPTIONIST_TEST)
+        wireJob(b.cardReceptionistPitch, Jobs.RECEPTIONIST_PITCH)
+        wireJob(b.cardReceptionistOnboard, Jobs.RECEPTIONIST_ONBOARD)
     }
 
     private fun wireQueue(card: JobCardBinding, queue: JobQueue) {
