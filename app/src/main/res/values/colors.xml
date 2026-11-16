@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#0A1424</color>
+    <color name="surface">#111F36</color>
+    <color name="surface2">#1A2D4A</color>
+    <color name="line">#24365A</color>
+    <color name="gold">#D4AF37</color>
+    <color name="gold_light">#E8C968</color>
+    <color name="ink">#F2F3F1</color>
+    <color name="muted">#AAB0B8</color>
+    <color name="success">#2F8F57</color>
+    <color name="success_bg">#0D2B1A</color>
+    <color name="error">#B0483F</color>
+    <color name="error_bg">#2B0D0D</color>
+    <color name="running">#3D6AB0</color>
+    <color name="running_bg">#0D1F36</color>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.ClaudeController" parent="Theme.Material3.Dark">
+        <item name="colorPrimary">@color/gold</item>
+        <item name="colorOnPrimary">@color/bg</item>
+        <item name="colorPrimaryContainer">@color/surface2</item>
+        <item name="colorOnPrimaryContainer">@color/ink</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/ink</item>
+        <item name="colorSurfaceVariant">@color/surface2</item>
+        <item name="colorOnSurfaceVariant">@color/muted</item>
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+    </style>
+
+    <style name="Theme.ClaudeController.NoActionBar" parent="Theme.ClaudeController">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+</resources>
