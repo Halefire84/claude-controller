@@ -34,11 +34,26 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build debug APK
+      - name: Decode keystore
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ${{ runner.temp }}/release.jks
+
+      - name: Build release APK
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          ./gradlew assembleRelease --no-daemon \
+            -Pandroid.injected.signing.store.file=${{ runner.temp }}/release.jks \
+            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASS }} \
+            -Pandroid.injected.signing.key.alias=${{ secrets.KEYSTORE_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEYSTORE_PASS }}
+
+      - name: Build debug APK (PRs only)
+        if: github.event_name == 'pull_request'
         run: ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
+        if: github.event_name == 'pull_request'
         with:
           name: debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
@@ -56,7 +71,7 @@ jobs:
           tag_name: v${{ steps.version.outputs.VERSION }}
           name: Claude Controller ${{ steps.version.outputs.VERSION }}
           body: |
-            ## Claude Controller — Debug Build
+            ## Claude Controller — Release Build
 
             AI job runner for Android. Streams Claude API responses, runs job queues, includes Receptionist Pack.
 
@@ -65,8 +80,8 @@ jobs:
             **Requires:** Your own Anthropic API key (enter in Settings after install).
 
             Built automatically from main branch.
-          files: app/build/outputs/apk/debug/app-debug.apk
+          files: app/build/outputs/apk/release/app-release.apk
           draft: false
-          prerelease: true
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
