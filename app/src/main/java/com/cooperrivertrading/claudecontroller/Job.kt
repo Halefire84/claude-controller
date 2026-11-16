@@ -211,7 +211,8 @@ object Jobs {
         systemPrompt = """
             You are Chris Hale writing a cold email pitching the CRTC AI Receptionist to a local business.
             The receptionist: runs on-device (no cloud, private), answers calls/texts 24/7, handles FAQ,
-            books appointments, and hands off to a human when needed. Price: ${'$'}149/mo setup + ${'$'}49/mo.
+            books appointments, and hands off to a human when needed.
+            Price: ${'$'}299 one-time setup + ${'$'}99/mo flat (no per-call fees, no contracts, unlimited).
             Rules: no exclamation points, no "I hope this finds you well", max 4 short paragraphs,
             one specific observation about their current answering situation, one clear offer with price, one CTA.
             Sign as: Chris Hale / crtcai.com
