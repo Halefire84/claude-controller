@@ -9,5 +9,5 @@
         android:pathData="M54,28L38,54L54,80L70,54Z" />
     <path android:fillColor="#111F36"
         android:pathData="M54,36L42,54L54,72L66,54Z" />
-    <circle android:fillColor="#D4AF37" android:cx="54" android:cy="54" android:r="4" />
+    <path android:fillColor="#D4AF37" android:pathData="M54,50 A4,4 0 1,0 54,58 A4,4 0 1,0 54,50 Z" />
 </vector>
