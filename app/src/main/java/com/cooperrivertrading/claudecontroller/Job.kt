@@ -1,5 +1,11 @@
 package com.cooperrivertrading.claudecontroller
 
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+private fun today(): String = SimpleDateFormat("MMM d, yyyy", Locale.US).format(Date())
+
 data class Job(
     val id: String,
     val icon: String,
@@ -62,7 +68,7 @@ object Jobs {
             Be direct and brief. Flag anything that looks like a hot lead.
         """.trimIndent(),
         buildPrompt = { _ ->
-            "Check haleclh@gmail.com for any replies to cold outreach emails sent today (Nov 16, 2026). Summarize each reply: who sent it, what they said, and what the next action should be. Flag hot leads."
+            "Check haleclh@gmail.com for any replies to cold outreach emails sent today (${today()}). Summarize each reply: who sent it, what they said, and what the next action should be. Flag hot leads."
         }
     )
 
@@ -134,5 +140,114 @@ object Jobs {
         buildPrompt = { param -> param ?: "" }
     )
 
-    val ALL = listOf(FIND_PROSPECTS, DRAFT_EMAIL, CHECK_INBOX, BUILD_DEMO, AUDIT_SITE, RUN_RUNBOOK, CUSTOM)
+    // ── Receptionist Pack ────────────────────────────────────────────────────
+
+    val RECEPTIONIST_BUILD_PROFILE = Job(
+        id = "receptionist_build_profile",
+        icon = "🏢",
+        title = "Build Receptionist Profile",
+        subtitle = "Full training profile for a business",
+        paramLabel = "Business name, type, and location",
+        paramHint = "e.g. Coastal HVAC — HVAC — Summerville SC",
+        systemPrompt = """
+            You are building a training profile for an AI receptionist (Starship OS, on-device, no cloud).
+            Output a structured profile the receptionist will use to answer calls and messages.
+            Include: business description, services list with prices if known, hours, location, FAQs (10+),
+            tone/voice (formal vs casual), escalation triggers (when to hand off to a human),
+            and a sample greeting script.
+            Format clearly with headers. Be specific. No generic filler.
+        """.trimIndent(),
+        buildPrompt = { param ->
+            "Build a complete AI receptionist training profile for: $param\nInclude services, hours, FAQ, tone, escalation rules, and a greeting script. This profile will be loaded into an on-device receptionist model."
+        }
+    )
+
+    val RECEPTIONIST_DRAFT_REPLY = Job(
+        id = "receptionist_draft_reply",
+        icon = "💬",
+        title = "Draft Receptionist Reply",
+        subtitle = "Reply to a customer inquiry in business voice",
+        paramLabel = "Business name + customer message",
+        paramHint = "e.g. Coastal HVAC — 'Do you service Goose Creek?'",
+        systemPrompt = """
+            You are an AI receptionist drafting a reply to a customer inquiry.
+            Rules: match the business's tone, be helpful and direct, keep it under 3 sentences,
+            end with a soft next step (call, booking link, or reply back).
+            Never say "I am an AI." Never use exclamation points. Never say "Great question!"
+        """.trimIndent(),
+        buildPrompt = { param ->
+            val parts = param?.split("—", limit = 2) ?: listOf("", "")
+            val biz = parts.getOrNull(0)?.trim() ?: param ?: ""
+            val inquiry = parts.getOrNull(1)?.trim() ?: "general inquiry"
+            "Business: $biz\nCustomer message: \"$inquiry\"\n\nDraft a receptionist reply."
+        }
+    )
+
+    val RECEPTIONIST_TEST = Job(
+        id = "receptionist_test",
+        icon = "🧪",
+        title = "Test Receptionist",
+        subtitle = "Run QA questions against a profile",
+        paramLabel = "Business name",
+        paramHint = "e.g. Coastal HVAC",
+        systemPrompt = """
+            You are a QA tester for an AI receptionist system.
+            Generate 10 realistic customer questions a business like this would receive.
+            For each question, write the ideal receptionist answer (under 3 sentences each).
+            Then flag any answers that seem risky, vague, or that should escalate to a human.
+        """.trimIndent(),
+        buildPrompt = { param ->
+            "Run a QA test for the AI receptionist for: $param\nGenerate 10 realistic customer questions and ideal short answers. Flag any that need human escalation."
+        }
+    )
+
+    val RECEPTIONIST_PITCH = Job(
+        id = "receptionist_pitch",
+        icon = "📣",
+        title = "Pitch Receptionist Service",
+        subtitle = "Cold email selling the AI receptionist",
+        paramLabel = "Business name and type",
+        paramHint = "e.g. Coastal HVAC — HVAC company",
+        systemPrompt = """
+            You are Chris Hale writing a cold email pitching the CRTC AI Receptionist to a local business.
+            The receptionist: runs on-device (no cloud, private), answers calls/texts 24/7, handles FAQ,
+            books appointments, and hands off to a human when needed. Price: ${'$'}149/mo setup + ${'$'}49/mo.
+            Rules: no exclamation points, no "I hope this finds you well", max 4 short paragraphs,
+            one specific observation about their current answering situation, one clear offer with price, one CTA.
+            Sign as: Chris Hale / crtcai.com
+        """.trimIndent(),
+        buildPrompt = { param ->
+            "Write a cold pitch email selling the CRTC AI Receptionist to: $param\nOutput: subject line first, then blank line, then email body."
+        }
+    )
+
+    val RECEPTIONIST_ONBOARD = Job(
+        id = "receptionist_onboard",
+        icon = "✅",
+        title = "Onboard New Client",
+        subtitle = "Setup checklist + handoff script",
+        paramLabel = "Business name and owner name",
+        paramHint = "e.g. Coastal HVAC — Mike",
+        systemPrompt = """
+            You are writing an onboarding checklist for a new CRTC AI Receptionist client.
+            Output two things:
+            1. A setup checklist (what info CRTC needs to collect from the client to configure the receptionist)
+            2. A handoff email to send the client explaining what happens next and what they'll receive
+            Be specific. No fluff. The checklist should be exhaustive so nothing gets missed.
+        """.trimIndent(),
+        buildPrompt = { param ->
+            val parts = param?.split("—", limit = 2) ?: listOf("", "")
+            val biz = parts.getOrNull(0)?.trim() ?: param ?: "the business"
+            val owner = parts.getOrNull(1)?.trim() ?: "the owner"
+            "Generate the onboarding checklist and handoff email for new CRTC AI Receptionist client: $biz (contact: $owner)"
+        }
+    )
+
+    val ALL = listOf(
+        FIND_PROSPECTS, DRAFT_EMAIL, CHECK_INBOX,
+        BUILD_DEMO, AUDIT_SITE,
+        RUN_RUNBOOK, CUSTOM,
+        RECEPTIONIST_BUILD_PROFILE, RECEPTIONIST_DRAFT_REPLY, RECEPTIONIST_TEST,
+        RECEPTIONIST_PITCH, RECEPTIONIST_ONBOARD
+    )
 }

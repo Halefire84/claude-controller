@@ -92,6 +92,33 @@
             <include layout="@layout/job_card"
                 android:id="@+id/cardCustomJob" />
 
+            <!-- Section: Receptionist -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="RECEPTIONIST"
+                android:textColor="@color/gold"
+                android:textSize="11sp"
+                android:letterSpacing="0.12"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <include layout="@layout/job_card"
+                android:id="@+id/cardReceptionistBuildProfile" />
+
+            <include layout="@layout/job_card"
+                android:id="@+id/cardReceptionistDraftReply" />
+
+            <include layout="@layout/job_card"
+                android:id="@+id/cardReceptionistTest" />
+
+            <include layout="@layout/job_card"
+                android:id="@+id/cardReceptionistPitch" />
+
+            <include layout="@layout/job_card"
+                android:id="@+id/cardReceptionistOnboard" />
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

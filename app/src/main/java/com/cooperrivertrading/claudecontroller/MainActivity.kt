@@ -32,6 +32,11 @@ class MainActivity : AppCompatActivity() {
         wireJob(JobCardBinding.bind(b.cardAuditSite), Jobs.AUDIT_SITE)
         wireJob(JobCardBinding.bind(b.cardRunRunbook), Jobs.RUN_RUNBOOK)
         wireJob(JobCardBinding.bind(b.cardCustomJob), Jobs.CUSTOM)
+        wireJob(JobCardBinding.bind(b.cardReceptionistBuildProfile), Jobs.RECEPTIONIST_BUILD_PROFILE)
+        wireJob(JobCardBinding.bind(b.cardReceptionistDraftReply), Jobs.RECEPTIONIST_DRAFT_REPLY)
+        wireJob(JobCardBinding.bind(b.cardReceptionistTest), Jobs.RECEPTIONIST_TEST)
+        wireJob(JobCardBinding.bind(b.cardReceptionistPitch), Jobs.RECEPTIONIST_PITCH)
+        wireJob(JobCardBinding.bind(b.cardReceptionistOnboard), Jobs.RECEPTIONIST_ONBOARD)
     }
 
     private fun wireJob(card: JobCardBinding, job: Job) {

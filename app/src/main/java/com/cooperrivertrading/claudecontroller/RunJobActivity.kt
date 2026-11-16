@@ -2,6 +2,7 @@ package com.cooperrivertrading.claudecontroller
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -44,6 +45,7 @@ class RunJobActivity : AppCompatActivity() {
 
         b.btnRun.setOnClickListener { startRun() }
         b.btnCopy.setOnClickListener { copyOutput() }
+        b.btnShare.setOnClickListener { shareOutput() }
         b.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
     }
 
@@ -85,6 +87,15 @@ class RunJobActivity : AppCompatActivity() {
         Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show()
     }
 
+    private fun shareOutput() {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, output.toString())
+            putExtra(Intent.EXTRA_SUBJECT, jobDef?.title ?: "Job Output")
+        }
+        startActivity(Intent.createChooser(intent, "Share output"))
+    }
+
     private enum class Status { RUNNING, DONE, STOPPED }
 
     private fun setStatus(s: Status) {
@@ -95,6 +106,7 @@ class RunJobActivity : AppCompatActivity() {
                 b.btnRun.text = getString(R.string.stop)
                 b.btnRun.setOnClickListener { stopRun() }
                 b.btnCopy.visibility = View.GONE
+                b.btnShare.visibility = View.GONE
                 b.paramsLayout.visibility = View.GONE
             }
             Status.DONE -> {
@@ -103,13 +115,16 @@ class RunJobActivity : AppCompatActivity() {
                 b.btnRun.text = getString(R.string.run)
                 b.btnRun.setOnClickListener { startRun() }
                 b.btnCopy.visibility = View.VISIBLE
+                b.btnShare.visibility = View.VISIBLE
             }
             Status.STOPPED -> {
                 b.statusText.text = getString(R.string.stopped)
                 b.statusDot.setBackgroundResource(R.drawable.dot_stopped)
                 b.btnRun.text = getString(R.string.run)
                 b.btnRun.setOnClickListener { startRun() }
-                b.btnCopy.visibility = if (output.isNotEmpty()) View.VISIBLE else View.GONE
+                val hasOutput = output.isNotEmpty()
+                b.btnCopy.visibility = if (hasOutput) View.VISIBLE else View.GONE
+                b.btnShare.visibility = if (hasOutput) View.VISIBLE else View.GONE
             }
         }
     }
