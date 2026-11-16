@@ -25,6 +25,11 @@ class MainActivity : AppCompatActivity() {
             } else false
         }
 
+        wireQueue(JobCardBinding.bind(b.cardQueueOutreach), Queues.OUTREACH)
+        wireQueue(JobCardBinding.bind(b.cardQueueReceptionist), Queues.RECEPTIONIST_PITCH)
+        wireQueue(JobCardBinding.bind(b.cardQueueSiteBuild), Queues.SITE_BUILD)
+        wireQueue(JobCardBinding.bind(b.cardQueueDailyOps), Queues.DAILY_OPS)
+
         wireJob(JobCardBinding.bind(b.cardFindProspects), Jobs.FIND_PROSPECTS)
         wireJob(JobCardBinding.bind(b.cardDraftEmail), Jobs.DRAFT_EMAIL)
         wireJob(JobCardBinding.bind(b.cardCheckInbox), Jobs.CHECK_INBOX)
@@ -37,6 +42,22 @@ class MainActivity : AppCompatActivity() {
         wireJob(JobCardBinding.bind(b.cardReceptionistTest), Jobs.RECEPTIONIST_TEST)
         wireJob(JobCardBinding.bind(b.cardReceptionistPitch), Jobs.RECEPTIONIST_PITCH)
         wireJob(JobCardBinding.bind(b.cardReceptionistOnboard), Jobs.RECEPTIONIST_ONBOARD)
+    }
+
+    private fun wireQueue(card: JobCardBinding, queue: JobQueue) {
+        card.jobIcon.text = queue.icon
+        card.jobTitle.text = queue.title
+        card.jobSubtitle.text = queue.subtitle
+        card.root.setOnClickListener {
+            if (!Prefs.hasApiKey(this)) {
+                Toast.makeText(this, getString(R.string.no_api_key), Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, SettingsActivity::class.java))
+                return@setOnClickListener
+            }
+            startActivity(Intent(this, RunQueueActivity::class.java).apply {
+                putExtra(RunQueueActivity.EXTRA_QUEUE_ID, queue.id)
+            })
+        }
     }
 
     private fun wireJob(card: JobCardBinding, job: Job) {
