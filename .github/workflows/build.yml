@@ -40,3 +40,30 @@ jobs:
           name: debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
+
+      - name: Get version name
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        id: version
+        run: echo "VERSION=$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
+          name: Claude Controller ${{ steps.version.outputs.VERSION }}
+          body: |
+            ## Claude Controller — Debug Build
+
+            AI job runner for Android. Streams Claude API responses, runs job queues, includes Receptionist Pack.
+
+            **Install:** Download the APK below, enable "Install from unknown sources" on your Android device, tap to install.
+
+            **Requires:** Your own Anthropic API key (enter in Settings after install).
+
+            Built automatically from main branch.
+          files: app/build/outputs/apk/debug/app-debug.apk
+          draft: false
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
