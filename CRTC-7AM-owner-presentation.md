@@ -215,3 +215,33 @@ Call at 6:42 PM; receptionist answers; customer wants yard cleanup before a Satu
 **Do not** do a live demo unless you have tested it end to end in the last 24 hours. Do not pass your phone around.
 
 **Conflict with an earlier file:** `CRTC-client-demo-script.md` in this repo quotes "$299 setup + $99/mo flat" for the receptionist. That figure came from older job text in the app, not from an approval. This brief says not to quote unapproved receptionist pricing, so use the "we need to understand your workflow first" answer this morning.
+
+---
+
+## 10. LIVE-CALL VERSION AND 7 AM TEST RUN
+
+Demo line: 843-452-5507 (VoIP, tested earlier). Keep this number off the handout. Video stays as the backup.
+
+**Test run (do this before the room fills, or at home first)**
+1. Call the line from a phone that is NOT your presenting phone. Put it on speaker.
+2. Check, in order: it answers, asks what the customer needs, collects name / number / address, books an estimate, and the owner text arrives.
+3. Time it. Note the length. If any step fails, use the video only and do not go live.
+4. Check signal or Wi-Fi in the room. Check speaker volume.
+5. Confirm the video is saved on the phone and plays with sound.
+
+**Live script (replaces the video intro)**
+"This is a demo line we set up for a made-up landscaping company. I'm going to call it right now, from this room. Please stay quiet for a minute."
+[Have an owner or helper call 843-452-5507 on speaker. Say nothing during the call.]
+
+**After the call (same wording as the video)**
+"It answered. It asked what was needed, collected the details, booked an estimate, and the owner got a text. That's the idea we're building around."
+
+**If it fails or lags:** "Let me show you the recorded demo instead." Play the video. Do not troubleshoot in front of the room.
+
+**Say / don't say**
+- OK: "We've tested this demo line." "This is a demonstration."
+- Not OK: "Customers are using it." "It works for every business." Any price, uptime or results number.
+
+**Go / no-go at 6:50 AM**
+- Test call passed, signal good: live call allowed, video as backup.
+- Anything shaky: video only (Plan A) or spoken walkthrough (Plan B).
