@@ -1,18 +1,19 @@
-name: Build APK
+name: Android local CI and manual release
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  verify:
+    name: Test and debug build (self-hosted)
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
@@ -22,64 +23,118 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set up Gradle cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml') }}
-          restore-keys: gradle-
+      - name: Detect and prepare local Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-$HOME/Android/Sdk}}"
+          if [ ! -x "$SDK/platform-tools/adb" ]; then
+            echo "::error::Android SDK/platform-tools not found on this self-hosted runner. Install Android SDK on the Ubuntu host first."
+            exit 1
+          fi
+          SM=$(find "$SDK/cmdline-tools" -path '*/bin/sdkmanager' -type f -executable -print -quit 2>/dev/null || true)
+          if [ -z "$SM" ]; then
+            echo "::error::sdkmanager is missing from $SDK/cmdline-tools."
+            exit 1
+          fi
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          echo "$SDK/platform-tools" >> "$GITHUB_PATH"
+          echo "$(dirname "$SM")" >> "$GITHUB_PATH"
+          echo "SDKMANAGER=$SM" >> "$GITHUB_ENV"
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      - name: Accept SDK licenses and ensure compile SDK 35
+        run: |
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Run unit tests and build debug APK
+        run: |
+          chmod +x gradlew
+          ./gradlew test assembleDebug --no-daemon
+
+      - name: Upload debug APK for phone testing
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-controller-debug-${{ github.sha }}
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    name: Signed release (manual only, self-hosted)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: self-hosted
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Detect and prepare local Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-$HOME/Android/Sdk}}"
+          test -x "$SDK/platform-tools/adb" || { echo "::error::Android SDK not found on this runner."; exit 1; }
+          SM=$(find "$SDK/cmdline-tools" -path '*/bin/sdkmanager' -type f -executable -print -quit 2>/dev/null || true)
+          test -n "$SM" || { echo "::error::sdkmanager not found."; exit 1; }
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          echo "$SDK/platform-tools" >> "$GITHUB_PATH"
+          echo "$(dirname "$SM")" >> "$GITHUB_PATH"
+          echo "SDKMANAGER=$SM" >> "$GITHUB_ENV"
+
+      - name: Check signing secrets
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+        run: |
+          test -n "$KEYSTORE_B64" || { echo "::error::KEYSTORE_BASE64 is missing."; exit 1; }
+          test -n "$KEYSTORE_PASS" || { echo "::error::KEYSTORE_PASS is missing."; exit 1; }
+          test -n "$KEYSTORE_ALIAS" || { echo "::error::KEYSTORE_ALIAS is missing."; exit 1; }
+
+      - name: Accept SDK licenses and ensure compile SDK 35
+        run: |
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Decode keystore
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ${{ runner.temp }}/release.jks
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: printf '%s' "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
 
-      - name: Build release APK
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      - name: Build signed release APK
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
         run: |
+          chmod +x gradlew
           ./gradlew assembleRelease --no-daemon \
-            -Pandroid.injected.signing.store.file=${{ runner.temp }}/release.jks \
-            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASS }} \
-            -Pandroid.injected.signing.key.alias=${{ secrets.KEYSTORE_ALIAS }} \
-            -Pandroid.injected.signing.key.password=${{ secrets.KEYSTORE_PASS }}
-
-      - name: Build debug APK (PRs only)
-        if: github.event_name == 'pull_request'
-        run: ./gradlew assembleDebug --no-daemon
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        if: github.event_name == 'pull_request'
-        with:
-          name: debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
+            -Pandroid.injected.signing.store.file="$RUNNER_TEMP/release.jks" \
+            -Pandroid.injected.signing.store.password="$KEYSTORE_PASS" \
+            -Pandroid.injected.signing.key.alias="$KEYSTORE_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEYSTORE_PASS"
+          rm -f "$RUNNER_TEMP/release.jks"
 
       - name: Get version name
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         id: version
-        run: echo "VERSION=$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        run: echo "VERSION=$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Create GitHub Release
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      - name: Create private GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.VERSION }}
           name: Claude Controller ${{ steps.version.outputs.VERSION }}
           body: |
-            ## Claude Controller — Release Build
-
-            AI job runner for Android. Streams Claude API responses, runs job queues, includes Receptionist Pack.
-
-            **Install:** Download the APK below, enable "Install from unknown sources" on your Android device, tap to install.
-
-            **Requires:** Your own Anthropic API key (enter in Settings after install).
-
-            Built automatically from main branch.
+            Signed Android release build. This is not a Google Play publication.
+            Store submission remains a separate owner-controlled action.
           files: app/build/outputs/apk/release/app-release.apk
           draft: false
           prerelease: false
