@@ -18,19 +18,6 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(b.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(true)
 
-        b.toolbar.setOnMenuItemClickListener { item ->
-            if (item.itemId == R.id.action_settings) {
-                startActivity(Intent(this, SettingsActivity::class.java))
-                true
-            } else if (item.itemId == R.id.action_history) {
-                startActivity(Intent(this, HistoryActivity::class.java))
-                true
-            } else if (item.itemId == R.id.action_dnc) {
-                startActivity(Intent(this, DncActivity::class.java))
-                true
-            } else false
-        }
-
         wireQueue(b.cardQueueOutreach, Queues.OUTREACH)
         wireQueue(b.cardQueueReceptionist, Queues.RECEPTIONIST_PITCH)
         wireQueue(b.cardQueueSiteBuild, Queues.SITE_BUILD)
@@ -48,6 +35,22 @@ class MainActivity : AppCompatActivity() {
         wireJob(b.cardReceptionistTest, Jobs.RECEPTIONIST_TEST)
         wireJob(b.cardReceptionistPitch, Jobs.RECEPTIONIST_PITCH)
         wireJob(b.cardReceptionistOnboard, Jobs.RECEPTIONIST_ONBOARD)
+    }
+
+    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        val target = when (item.itemId) {
+            R.id.action_settings -> SettingsActivity::class.java
+            R.id.action_history -> HistoryActivity::class.java
+            R.id.action_dnc -> DncActivity::class.java
+            else -> return super.onOptionsItemSelected(item)
+        }
+        startActivity(Intent(this, target))
+        return true
     }
 
     private fun wireQueue(card: JobCardBinding, queue: JobQueue) {
