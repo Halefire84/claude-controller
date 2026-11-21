@@ -23,6 +23,9 @@ class RunJobActivity : AppCompatActivity() {
     private var jobDef: com.cooperrivertrading.claudecontroller.Job? = null
     private var runJob: Job? = null
     private val output = StringBuilder()
+    private var lastParam: String? = null
+    private var saved = false
+    private val saver = SaveToFile(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,12 +49,26 @@ class RunJobActivity : AppCompatActivity() {
         b.btnRun.setOnClickListener { startRun() }
         b.btnCopy.setOnClickListener { copyOutput() }
         b.btnShare.setOnClickListener { shareOutput() }
+        b.btnSave.setOnClickListener { saver.save(jobDef?.title ?: "output", output.toString()) }
         b.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
     }
 
-    private fun startRun() {
+    private fun startRun(skipDncCheck: Boolean = false) {
         val job = jobDef ?: return
         val param = b.paramInput.text?.toString()?.trim()
+
+        if (!skipDncCheck && job.id in DoNotContact.CHECKED_JOBS) {
+            val hit = DoNotContact.match(param, DncPrefs.load(this))
+            if (hit != null) {
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Do not contact")
+                    .setMessage("\"${hit.trim()}\" is on your do-not-contact list. Draft anyway?")
+                    .setPositiveButton("Draft anyway") { _, _ -> startRun(skipDncCheck = true) }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+                return
+            }
+        }
 
         if (job.paramLabel != null && param.isNullOrBlank() && job.id != "check_inbox") {
             b.paramInput.error = "Required"
@@ -59,6 +76,8 @@ class RunJobActivity : AppCompatActivity() {
         }
 
         output.clear()
+        lastParam = param
+        saved = false
         b.outputText.text = ""
         setStatus(Status.RUNNING)
 
@@ -106,18 +125,22 @@ class RunJobActivity : AppCompatActivity() {
                 b.btnRun.text = getString(R.string.stop)
                 b.btnRun.setOnClickListener { stopRun() }
                 b.btnCopy.visibility = View.GONE
+                b.btnSave.visibility = View.GONE
                 b.btnShare.visibility = View.GONE
                 b.paramsLayout.visibility = View.GONE
             }
             Status.DONE -> {
+                saveHistory()
                 b.statusText.text = "Done — ${output.length} chars"
                 b.statusDot.setBackgroundResource(R.drawable.dot_done)
                 b.btnRun.text = getString(R.string.run)
                 b.btnRun.setOnClickListener { startRun() }
                 b.btnCopy.visibility = View.VISIBLE
+                b.btnSave.visibility = View.VISIBLE
                 b.btnShare.visibility = View.VISIBLE
             }
             Status.STOPPED -> {
+                saveHistory()
                 b.statusText.text = getString(R.string.stopped)
                 b.statusDot.setBackgroundResource(R.drawable.dot_stopped)
                 b.btnRun.text = getString(R.string.run)
@@ -125,8 +148,16 @@ class RunJobActivity : AppCompatActivity() {
                 val hasOutput = output.isNotEmpty()
                 b.btnCopy.visibility = if (hasOutput) View.VISIBLE else View.GONE
                 b.btnShare.visibility = if (hasOutput) View.VISIBLE else View.GONE
+                b.btnSave.visibility = if (hasOutput) View.VISIBLE else View.GONE
             }
         }
+    }
+
+    private fun saveHistory() {
+        val job = jobDef ?: return
+        if (saved) return
+        saved = true
+        HistoryStore(SqliteHistoryStorage(this)).record(System.currentTimeMillis(), job.id, lastParam, output.toString())
     }
 
     private fun stopRun() {

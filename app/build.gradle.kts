@@ -48,4 +48,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.security.crypto)
+    testImplementation(libs.junit)
 }
