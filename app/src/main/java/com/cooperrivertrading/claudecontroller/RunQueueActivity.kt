@@ -87,6 +87,8 @@ class RunQueueActivity : AppCompatActivity() {
                 appendOutput("\n")
             }
 
+            HistoryStore(SqliteHistoryStorage(this@RunQueueActivity))
+                .record(System.currentTimeMillis(), queue.id, null, fullOutput.toString())
             b.statusText.text = "Done — ${queue.steps.size} steps complete"
             b.statusDot.setBackgroundResource(R.drawable.dot_done)
             b.btnRunQueue.isEnabled = true

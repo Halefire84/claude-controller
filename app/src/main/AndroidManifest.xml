@@ -32,6 +32,9 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <activity android:name=".HistoryActivity" android:exported="false" />
+        <activity android:name=".HistoryDetailActivity" android:exported="false" />
+
         <activity
             android:name=".SettingsActivity"
             android:exported="false" />

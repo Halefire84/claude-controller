@@ -22,6 +22,9 @@ class MainActivity : AppCompatActivity() {
             if (item.itemId == R.id.action_settings) {
                 startActivity(Intent(this, SettingsActivity::class.java))
                 true
+            } else if (item.itemId == R.id.action_history) {
+                startActivity(Intent(this, HistoryActivity::class.java))
+                true
             } else false
         }
 

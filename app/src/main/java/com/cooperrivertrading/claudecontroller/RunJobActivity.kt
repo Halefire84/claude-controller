@@ -23,6 +23,8 @@ class RunJobActivity : AppCompatActivity() {
     private var jobDef: com.cooperrivertrading.claudecontroller.Job? = null
     private var runJob: Job? = null
     private val output = StringBuilder()
+    private var lastParam: String? = null
+    private var saved = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +61,8 @@ class RunJobActivity : AppCompatActivity() {
         }
 
         output.clear()
+        lastParam = param
+        saved = false
         b.outputText.text = ""
         setStatus(Status.RUNNING)
 
@@ -110,6 +114,7 @@ class RunJobActivity : AppCompatActivity() {
                 b.paramsLayout.visibility = View.GONE
             }
             Status.DONE -> {
+                saveHistory()
                 b.statusText.text = "Done — ${output.length} chars"
                 b.statusDot.setBackgroundResource(R.drawable.dot_done)
                 b.btnRun.text = getString(R.string.run)
@@ -118,6 +123,7 @@ class RunJobActivity : AppCompatActivity() {
                 b.btnShare.visibility = View.VISIBLE
             }
             Status.STOPPED -> {
+                saveHistory()
                 b.statusText.text = getString(R.string.stopped)
                 b.statusDot.setBackgroundResource(R.drawable.dot_stopped)
                 b.btnRun.text = getString(R.string.run)
@@ -127,6 +133,13 @@ class RunJobActivity : AppCompatActivity() {
                 b.btnShare.visibility = if (hasOutput) View.VISIBLE else View.GONE
             }
         }
+    }
+
+    private fun saveHistory() {
+        val job = jobDef ?: return
+        if (saved) return
+        saved = true
+        HistoryStore(SqliteHistoryStorage(this)).record(System.currentTimeMillis(), job.id, lastParam, output.toString())
     }
 
     private fun stopRun() {
