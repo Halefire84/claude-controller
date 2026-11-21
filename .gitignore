@@ -1,0 +1,12 @@
+# build output and machine-local files
+.gradle/
+build/
+app/build/
+local.properties
+*.apk
+*.aab
+*.jks
+*.p12
+*.keystore
+keystore.properties
+.kotlin/
