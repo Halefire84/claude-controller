@@ -1,11 +1,5 @@
 package com.cooperrivertrading.claudecontroller
 
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-
-private fun today(): String = SimpleDateFormat("MMM d, yyyy", Locale.US).format(Date())
-
 data class Job(
     val id: String,
     val icon: String,
@@ -68,7 +62,7 @@ object Jobs {
             Be direct and brief. Flag anything that looks like a hot lead.
         """.trimIndent(),
         buildPrompt = { _ ->
-            "Check haleclh@gmail.com for any replies to cold outreach emails sent today (${today()}). Summarize each reply: who sent it, what they said, and what the next action should be. Flag hot leads."
+            "Check haleclh@gmail.com for any replies to cold outreach emails sent today (${PromptDate.today()}). Summarize each reply: who sent it, what they said, and what the next action should be. Flag hot leads."
         }
     )
 
