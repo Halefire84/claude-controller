@@ -10,6 +10,8 @@ import com.cooperrivertrading.claudecontroller.databinding.ActivityHistoryDetail
 
 class HistoryDetailActivity : AppCompatActivity() {
 
+    private val saver = SaveToFile(this)
+
     companion object { const val EXTRA_ID = "history_id" }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +33,7 @@ class HistoryDetailActivity : AppCompatActivity() {
             cm.setPrimaryClip(ClipData.newPlainText("job_output", e.output))
             Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show()
         }
+        b.btnDetailSave.setOnClickListener { saver.save(HistoryActivity.jobTitle(e.jobType), e.output) }
         b.btnDetailShare.setOnClickListener {
             val i = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"

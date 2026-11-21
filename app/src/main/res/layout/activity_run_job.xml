@@ -116,6 +116,17 @@
                 android:text="Ready" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:contentDescription="Save output to a file"
+                android:textSize="13sp"
+                style="@style/Widget.Material3.Button.TextButton"
+                app:iconTint="@color/muted"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnShare"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

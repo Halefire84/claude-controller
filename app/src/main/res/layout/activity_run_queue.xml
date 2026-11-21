@@ -88,6 +88,16 @@
                 android:text="Ready" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSaveQueue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:contentDescription="Save queue output to a file"
+                android:textSize="13sp"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnShareQueue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

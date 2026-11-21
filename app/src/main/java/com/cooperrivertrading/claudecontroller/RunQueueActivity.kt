@@ -23,6 +23,7 @@ class RunQueueActivity : AppCompatActivity() {
     private var queueDef: JobQueue? = null
     private var runJob: Job? = null
     private val fullOutput = StringBuilder()
+    private val saver = SaveToFile(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +42,7 @@ class RunQueueActivity : AppCompatActivity() {
         b.btnRunQueue.setOnClickListener { startQueue() }
         b.btnCopyQueue.setOnClickListener { copyOutput() }
         b.btnShareQueue.setOnClickListener { shareOutput() }
+        b.btnSaveQueue.setOnClickListener { saver.save(queueDef?.title ?: "queue", fullOutput.toString()) }
         b.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
     }
 
@@ -52,6 +54,7 @@ class RunQueueActivity : AppCompatActivity() {
         b.outputText.text = ""
         b.btnCopyQueue.visibility = View.GONE
         b.btnShareQueue.visibility = View.GONE
+        b.btnSaveQueue.visibility = View.GONE
         b.btnRunQueue.isEnabled = false
 
         runJob = lifecycleScope.launch {
@@ -94,6 +97,7 @@ class RunQueueActivity : AppCompatActivity() {
             b.btnRunQueue.isEnabled = true
             b.btnCopyQueue.visibility = View.VISIBLE
             b.btnShareQueue.visibility = View.VISIBLE
+            b.btnSaveQueue.visibility = View.VISIBLE
         }
     }
 

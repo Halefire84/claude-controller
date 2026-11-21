@@ -25,6 +25,7 @@ class RunJobActivity : AppCompatActivity() {
     private val output = StringBuilder()
     private var lastParam: String? = null
     private var saved = false
+    private val saver = SaveToFile(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +49,7 @@ class RunJobActivity : AppCompatActivity() {
         b.btnRun.setOnClickListener { startRun() }
         b.btnCopy.setOnClickListener { copyOutput() }
         b.btnShare.setOnClickListener { shareOutput() }
+        b.btnSave.setOnClickListener { saver.save(jobDef?.title ?: "output", output.toString()) }
         b.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
     }
 
@@ -110,6 +112,7 @@ class RunJobActivity : AppCompatActivity() {
                 b.btnRun.text = getString(R.string.stop)
                 b.btnRun.setOnClickListener { stopRun() }
                 b.btnCopy.visibility = View.GONE
+                b.btnSave.visibility = View.GONE
                 b.btnShare.visibility = View.GONE
                 b.paramsLayout.visibility = View.GONE
             }
@@ -120,6 +123,7 @@ class RunJobActivity : AppCompatActivity() {
                 b.btnRun.text = getString(R.string.run)
                 b.btnRun.setOnClickListener { startRun() }
                 b.btnCopy.visibility = View.VISIBLE
+                b.btnSave.visibility = View.VISIBLE
                 b.btnShare.visibility = View.VISIBLE
             }
             Status.STOPPED -> {
@@ -131,6 +135,7 @@ class RunJobActivity : AppCompatActivity() {
                 val hasOutput = output.isNotEmpty()
                 b.btnCopy.visibility = if (hasOutput) View.VISIBLE else View.GONE
                 b.btnShare.visibility = if (hasOutput) View.VISIBLE else View.GONE
+                b.btnSave.visibility = if (hasOutput) View.VISIBLE else View.GONE
             }
         }
     }
