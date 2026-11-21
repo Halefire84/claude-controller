@@ -5,7 +5,7 @@
         android:id="@+id/action_history"
         android:title="History"
         android:contentDescription="Job history"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_dnc"
         android:title="Do not contact"
