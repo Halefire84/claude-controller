@@ -53,9 +53,22 @@ class RunJobActivity : AppCompatActivity() {
         b.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
     }
 
-    private fun startRun() {
+    private fun startRun(skipDncCheck: Boolean = false) {
         val job = jobDef ?: return
         val param = b.paramInput.text?.toString()?.trim()
+
+        if (!skipDncCheck && job.id in DoNotContact.CHECKED_JOBS) {
+            val hit = DoNotContact.match(param, DncPrefs.load(this))
+            if (hit != null) {
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Do not contact")
+                    .setMessage("\"${hit.trim()}\" is on your do-not-contact list. Draft anyway?")
+                    .setPositiveButton("Draft anyway") { _, _ -> startRun(skipDncCheck = true) }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+                return
+            }
+        }
 
         if (job.paramLabel != null && param.isNullOrBlank() && job.id != "check_inbox") {
             b.paramInput.error = "Required"

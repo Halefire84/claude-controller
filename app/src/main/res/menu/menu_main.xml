@@ -7,6 +7,11 @@
         android:contentDescription="Job history"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/action_dnc"
+        android:title="Do not contact"
+        android:contentDescription="Do-not-contact list"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_settings"
         android:title="Settings"
         android:icon="@drawable/ic_settings"

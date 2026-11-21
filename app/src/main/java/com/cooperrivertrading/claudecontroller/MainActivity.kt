@@ -25,6 +25,9 @@ class MainActivity : AppCompatActivity() {
             } else if (item.itemId == R.id.action_history) {
                 startActivity(Intent(this, HistoryActivity::class.java))
                 true
+            } else if (item.itemId == R.id.action_dnc) {
+                startActivity(Intent(this, DncActivity::class.java))
+                true
             } else false
         }
 
